@@ -1,0 +1,42 @@
+<% Like.where(user_id: @user_id).each do |like| %>
+
+    <div class="card" style="width: 80%; margin: 0 auto;">
+      <div class="card-body">
+        <!--displays the original poster of the photo -->
+        <h5 class="card-title"><%= User.find(Photo.find(like.photo_id).user_id).username %> <%= time_ago_in_words(like.updated_at)  %> </h5>
+        <p><img src = "<%= Photo.find(like.photo_id).image %>" width = "100%" height = "auto"></p>
+        
+        <!--add captions-->
+        <strong><%=Photo.find(like.photo_id).caption%></strong>
+
+        <!--now need all the comments-->
+        <% Comment.all.where(photo_id: like.photo_id).each do |comment| %>
+            <!--commenter and comment date-->
+            <p class="card-text">
+                <%= User.find(comment.user_id).username %> <%= time_ago_in_words(comment.updated_at) %> ago
+            </p>
+            <p class = "card-text">
+                <%= comment.body%>
+            </p>
+        <% end %>
+        
+        <a href = "/delete_like/<%=like.id%>">Unlike</a>
+
+        <form action = "/create_comment" method = "post">
+            <!--the photo_id and the user_id should be supplied automatically-->
+            <input type = "hidden" id = "photo_id" name = "photo_id" value = "<%=like.photo_id%>">
+            <input type = "hidden" id = "user_id" name = "user_id" value = "<%=like.user_id%>">
+            
+            <div class = "form-group">
+                <textarea id="body" name="body" class="form-control" rows="3"></textarea>
+            </div>
+            
+            <button class = "btn btn-block btn-outline-secondary">
+                Add comment
+            </button>
+        </form>
+
+      </div>
+    </div>
+    
+<% end %>

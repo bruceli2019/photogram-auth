@@ -1,0 +1,75 @@
+<button class = "btn btn-block btn-outline-secondary">
+  <a href = "/photos/new">Add Photo</a> 
+</button>
+
+<% Photo.all.each do |photo| %>
+
+    <div class="card" style="width: 80%; margin: 0 auto;">
+      <div class="card-body">
+        <!--displays the original poster of the photo -->
+        <h5 class="card-title"><%= User.find(Photo.find(photo.id).user_id).username %> <%= time_ago_in_words(photo.updated_at)  %> </h5>
+        <p><img src = "<%= photo.image %>" width = "100%" height = "auto"></p>
+        
+        <!--add captions-->
+        <strong><%=photo.caption%></strong>
+
+        <!--now need all the comments-->
+        <% Comment.where(photo_id: photo.id).each do |comment| %>
+            <!--commenter and comment date-->
+            <p class="card-text">
+                <%= User.find(comment.user_id).username %> <%= time_ago_in_words(comment.updated_at) %> ago
+            </p>
+            <p class = "card-text">
+                <%= comment.body%>
+            </p>
+        <% end %>
+        
+        <!--if there is no current like, we add a "like button"; current like, add unlike button-->
+        <% if Like.find_by(photo_id: photo.id, user_id: current_user.id).blank? %>
+          <form action = "/create_like" method = "post">
+            <input type = "hidden" id = "user_id" name = "user_id" value = "<%=current_user.id%>">
+            <input type = "hidden" id = "photo_id" name = "photo_id" value = "<%=photo.id%>">
+            <button class = "btn btn-block btn-outline-secondary">
+              Like
+            </button>
+          </form>
+        <% else %>
+          <button class = "btn btn-block btn-outline-secondary">
+            <!--THIS find_by WORKED OMG-->
+            <a href = "/delete_like/<%= Like.find_by(photo_id: photo.id, user_id: current_user.id).id%>">Unlike</a> 
+          </button>
+        <% end %>
+        
+
+
+        <form action = "/create_comment" method = "post">
+            <!--the photo_id and the user_id should be supplied automatically-->
+            <input type = "hidden" id = "photo_id" name = "photo_id" value = "<%=photo.id%>">
+            <input type = "hidden" id = "user_id" name = "user_id" value = "<%=current_user.id%>">
+            
+            <div class = "form-group">
+                <input placeholder = "Add a comment..." id="body" name="body" class="form-control">
+            </div>
+            
+            <button class = "btn btn-block btn-outline-secondary">
+                Add Comment
+            </button>
+        </form>
+        
+
+        <% if (photo.user_id == current_user.id) %>
+          <a href = "/photos/<%= photo.id %>/edit">
+            Edit Photo
+          </a>
+        <% end %>
+
+        <% if (photo.user_id == current_user.id) %>
+          <a href = "/delete_photo/<%= photo.id %>">
+            Delete Photo
+          </a>
+        <% end %>
+        
+      </div>
+    </div>
+    
+<% end %>

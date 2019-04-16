@@ -1,0 +1,30 @@
+<h1>
+  Add a new like
+</h1>
+
+
+<hr>
+
+<form action="/create_like" method="post">
+
+  <!--user id hidden-->
+  <input type="hidden" id="user_id" name="user_id" value = "<%=current_user.id%>" class="form-control">
+
+  <div class="form-group">
+    <label for="photo_id">
+      Photo
+    </label>
+
+    <%= select_tag("photo_id", options_from_collection_for_select(Photo.all, :id, :caption, @like.try(:photo_id)), :class => "form-control") %>
+  </div>
+
+  <button class="btn btn-block btn-outline-secondary">
+    Create like
+  </button>
+</form>
+
+<hr>
+
+<a href="/likes">
+  Go back
+</a>
